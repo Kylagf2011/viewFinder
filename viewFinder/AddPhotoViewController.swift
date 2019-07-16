@@ -14,6 +14,7 @@ class AddPhotoViewController: UIViewController, UIImagePickerControllerDelegate,
     var imagePicker = UIImagePickerController()
     
     @IBOutlet weak var textBox: UITextField!
+    @IBOutlet weak var newImage: UIImageView!
     
     
     override func viewDidLoad() {
@@ -42,14 +43,6 @@ class AddPhotoViewController: UIViewController, UIImagePickerControllerDelegate,
         present(imagePicker, animated: true, completion: nil)
     }
     
-    
-    @IBAction func saveTap(_ sender: Any) {
-        
-    }
-    
-    @IBOutlet weak var newImage: UIImageView!
-    
-    
     //selected image will replace the stock photo with this code
     internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage =
@@ -57,6 +50,30 @@ class AddPhotoViewController: UIViewController, UIImagePickerControllerDelegate,
                 as? UIImage {newImage.image = selectedImage}
         imagePicker.dismiss(animated: true, completion: nil)
     }
+    
+    @IBAction func saveTap(_ sender: UIButton) {
+        if let context =
+        (UIApplication.shared.delegate
+        as?
+        AppDelegate)?.persistentContainer.viewContext
+        {
+            let photoToSave = Photos(entity: Photos.entity(), insertInto: context)
+            
+            photoToSave.caption =
+            textBox.text
+            
+            if let userImage = newImage.image{
+                if let userImageData = userImage.pngData(){
+                    photoToSave.imageData = userImageData
+                }
+            }
+            (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+            
+            
+            navigationController?.popViewController(animated: true)
+        }
+    }
+
     /*
     // MARK: - Navigation
 
